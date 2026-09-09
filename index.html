@@ -1,0 +1,934 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Mimic It!</title>
+
+<style>
+* {
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
+
+body {
+  margin: 0;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+  background: linear-gradient(160deg, #17132f, #30205f);
+  color: white;
+  min-height: 100vh;
+}
+
+.container {
+  width: 100%;
+  max-width: 500px;
+  margin: auto;
+  padding: 25px 18px 40px;
+}
+
+h1 {
+  text-align: center;
+  font-size: 42px;
+  margin: 10px 0 5px;
+}
+
+.subtitle {
+  text-align: center;
+  opacity: .75;
+  margin-bottom: 25px;
+}
+
+.card {
+  background: rgba(255,255,255,.10);
+  border-radius: 22px;
+  padding: 20px;
+  margin-bottom: 18px;
+  box-shadow: 0 8px 30px rgba(0,0,0,.2);
+}
+
+input {
+  width: 100%;
+  padding: 15px;
+  font-size: 18px;
+  border: 0;
+  border-radius: 14px;
+  margin-bottom: 10px;
+  outline: none;
+}
+
+button {
+  width: 100%;
+  border: 0;
+  border-radius: 16px;
+  padding: 17px;
+  font-size: 18px;
+  font-weight: 700;
+  margin-top: 10px;
+  cursor: pointer;
+  background: white;
+  color: #241744;
+}
+
+button:active {
+  transform: scale(.97);
+}
+
+.primary {
+  background: #7c5cff;
+  color: white;
+}
+
+.danger {
+  background: #ff4f6d;
+  color: white;
+  width: auto;
+  padding: 10px 14px;
+  font-size: 14px;
+  margin: 0;
+}
+
+.player {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.player input {
+  margin: 0;
+}
+
+.player button {
+  flex-shrink: 0;
+}
+
+.hidden {
+  display: none !important;
+}
+
+.sound {
+  font-size: 65px;
+  text-align: center;
+  margin: 15px 0;
+}
+
+.soundName {
+  text-align: center;
+  font-size: 28px;
+  font-weight: 800;
+  margin-bottom: 10px;
+}
+
+.round {
+  text-align: center;
+  opacity: .7;
+}
+
+.countdown {
+  text-align: center;
+  font-size: 70px;
+  font-weight: 900;
+  margin: 15px;
+}
+
+.status {
+  text-align: center;
+  font-size: 20px;
+  margin: 15px 0;
+}
+
+.score {
+  text-align: center;
+  font-size: 80px;
+  font-weight: 900;
+  margin: 10px 0;
+}
+
+.scoreText {
+  text-align: center;
+  font-size: 22px;
+}
+
+.leaderboard div {
+  display: flex;
+  justify-content: space-between;
+  padding: 14px 5px;
+  border-bottom: 1px solid rgba(255,255,255,.15);
+  font-size: 19px;
+}
+
+.bigEmoji {
+  text-align: center;
+  font-size: 80px;
+}
+
+.small {
+  text-align: center;
+  opacity: .65;
+  font-size: 14px;
+  margin-top: 12px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="container">
+
+<!-- SETUP -->
+<section id="setup">
+  <h1>🎤 Mimic It!</h1>
+  <div class="subtitle">Hear it. Copy it. Beat your mates.</div>
+
+  <div class="card">
+    <h2>Players</h2>
+
+    <div id="players"></div>
+
+    <button id="addBtn">➕ Add Player</button>
+
+    <div class="small">
+      Minimum 2 players · Maximum 12
+    </div>
+  </div>
+
+  <div class="card">
+    <button class="primary" id="startBtn">
+      🚀 Start Game
+    </button>
+  </div>
+</section>
+
+
+<!-- CHALLENGE -->
+<section id="challenge" class="hidden">
+
+  <div class="round" id="roundText"></div>
+
+  <div class="card">
+    <div class="sound" id="soundEmoji">🔊</div>
+    <div class="soundName" id="soundName">Get ready...</div>
+
+    <button class="primary" id="playSoundBtn">
+      🔊 Play Sound
+    </button>
+
+    <div id="countdown" class="countdown"></div>
+
+    <button id="recordBtn" class="hidden">
+      🎙️ Hold to Record
+    </button>
+
+    <div class="status" id="status"></div>
+  </div>
+
+</section>
+
+
+<!-- SCORE -->
+<section id="scoreScreen" class="hidden">
+
+  <div class="card">
+
+    <div class="bigEmoji">🏆</div>
+
+    <h2 id="playerResult" style="text-align:center;"></h2>
+
+    <div class="score" id="scoreNumber">0</div>
+
+    <div class="scoreText">
+      points
+    </div>
+
+    <button class="primary" id="nextBtn">
+      ➡️ Next Player
+    </button>
+
+  </div>
+
+</section>
+
+
+<!-- LEADERBOARD -->
+<section id="leaderboardScreen" class="hidden">
+
+  <div class="card">
+
+    <div class="bigEmoji">🏆</div>
+
+    <h2 style="text-align:center;">Leaderboard</h2>
+
+    <div class="leaderboard" id="leaderboard"></div>
+
+    <button class="primary" id="nextRoundBtn">
+      🔥 Next Round
+    </button>
+
+    <button id="finishBtn">
+      🏁 Finish Game
+    </button>
+
+  </div>
+
+</section>
+
+
+<!-- FINAL -->
+<section id="finalScreen" class="hidden">
+
+  <div class="card">
+
+    <div class="bigEmoji">🎉</div>
+
+    <h2 style="text-align:center;">Final Results</h2>
+
+    <div class="leaderboard" id="finalLeaderboard"></div>
+
+    <button class="primary" id="againBtn">
+      🔄 Play Again
+    </button>
+
+  </div>
+
+</section>
+
+</div>
+
+
+<script>
+
+const sounds = [
+  {name:"Dog Bark", emoji:"🐶", type:"bark"},
+  {name:"Siren", emoji:"🚨", type:"siren"},
+  {name:"Laser", emoji:"🔫", type:"laser"},
+  {name:"Drum", emoji:"🥁", type:"drum"},
+  {name:"Horn", emoji:"📯", type:"horn"},
+  {name:"Alarm", emoji:"⏰", type:"alarm"},
+  {name:"Robot", emoji:"🤖", type:"robot"},
+  {name:"Clap", emoji:"👏", type:"clap"},
+  {name:"Laugh", emoji:"😂", type:"laugh"}
+];
+
+let players = [];
+let scores = {};
+let currentPlayer = 0;
+let currentRound = 1;
+let currentSound;
+let recorder;
+let audioChunks = [];
+let recordingStart = 0;
+let audioContext;
+
+
+/* ---------- SCREEN CONTROL ---------- */
+
+function show(id) {
+  document.querySelectorAll("section").forEach(s => {
+    s.classList.add("hidden");
+  });
+
+  document.getElementById(id).classList.remove("hidden");
+}
+
+
+/* ---------- PLAYERS ---------- */
+
+function renderPlayers() {
+
+  const box = document.getElementById("players");
+  box.innerHTML = "";
+
+  players.forEach((name, index) => {
+
+    const row = document.createElement("div");
+    row.className = "player";
+
+    const input = document.createElement("input");
+    input.value = name;
+    input.placeholder = "Player " + (index + 1);
+
+    input.addEventListener("input", () => {
+      players[index] = input.value;
+    });
+
+    const remove = document.createElement("button");
+    remove.textContent = "✕";
+    remove.className = "danger";
+
+    remove.addEventListener("click", () => {
+
+      if (players.length <= 2) {
+        alert("You need at least 2 players.");
+        return;
+      }
+
+      players.splice(index, 1);
+      renderPlayers();
+    });
+
+    row.appendChild(input);
+    row.appendChild(remove);
+
+    box.appendChild(row);
+  });
+
+  document.getElementById("addBtn").disabled =
+    players.length >= 12;
+}
+
+
+document.getElementById("addBtn").addEventListener("click", () => {
+
+  if (players.length >= 12) {
+    alert("Maximum 12 players.");
+    return;
+  }
+
+  players.push("Player " + (players.length + 1));
+
+  renderPlayers();
+});
+
+
+/* Start with two players */
+
+players = ["Player 1", "Player 2"];
+renderPlayers();
+
+
+/* ---------- START GAME ---------- */
+
+document.getElementById("startBtn").addEventListener("click", () => {
+
+  players = players.map((p, i) => {
+    const name = p.trim();
+    return name || "Player " + (i + 1);
+  });
+
+  if (players.length < 2) {
+    alert("Add at least 2 players.");
+    return;
+  }
+
+  scores = {};
+
+  players.forEach(p => scores[p] = 0);
+
+  currentRound = 1;
+  currentPlayer = 0;
+
+  startTurn();
+});
+
+
+/* ---------- SOUND ---------- */
+
+function getAudioContext() {
+
+  if (!audioContext) {
+    audioContext = new (window.AudioContext || window.webkitAudioContext)();
+  }
+
+  if (audioContext.state === "suspended") {
+    audioContext.resume();
+  }
+
+  return audioContext;
+}
+
+
+function tone(freq, duration, volume = .25, type = "sine") {
+
+  const ctx = getAudioContext();
+
+  const osc = ctx.createOscillator();
+  const gain = ctx.createGain();
+
+  osc.type = type;
+  osc.frequency.value = freq;
+
+  gain.gain.setValueAtTime(volume, ctx.currentTime);
+  gain.gain.exponentialRampToValueAtTime(
+    .001,
+    ctx.currentTime + duration
+  );
+
+  osc.connect(gain);
+  gain.connect(ctx.destination);
+
+  osc.start();
+  osc.stop(ctx.currentTime + duration);
+}
+
+
+function playSound(type) {
+
+  const ctx = getAudioContext();
+
+  if (type === "bark") {
+    tone(180,.18,.45,"sawtooth");
+    setTimeout(() => tone(130,.20,.45,"sawtooth"),180);
+  }
+
+  else if (type === "siren") {
+
+    let start = Date.now();
+
+    const interval = setInterval(() => {
+
+      const t = (Date.now() - start) / 1000;
+
+      tone(
+        500 + Math.sin(t * 5) * 350,
+        .18,
+        .25,
+        "square"
+      );
+
+    },180);
+
+    setTimeout(() => clearInterval(interval),1800);
+  }
+
+  else if (type === "laser") {
+    tone(1200,.15,.3,"sawtooth");
+    setTimeout(() => tone(300,.45,.3,"sawtooth"),100);
+  }
+
+  else if (type === "drum") {
+
+    const osc = ctx.createOscillator();
+    const gain = ctx.createGain();
+
+    osc.frequency.setValueAtTime(140,ctx.currentTime);
+    osc.frequency.exponentialRampToValueAtTime(
+      45,
+      ctx.currentTime + .35
+    );
+
+    gain.gain.setValueAtTime(.7,ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(
+      .001,
+      ctx.currentTime + .35
+    );
+
+    osc.connect(gain);
+    gain.connect(ctx.destination);
+
+    osc.start();
+    osc.stop(ctx.currentTime+.35);
+  }
+
+  else if (type === "horn") {
+    tone(220,.4,.35,"sawtooth");
+    setTimeout(() => tone(280,.4,.35,"sawtooth"),400);
+  }
+
+  else if (type === "alarm") {
+
+    tone(800,.25,.3,"square");
+
+    setTimeout(() => {
+      tone(1100,.25,.3,"square");
+    },250);
+
+    setTimeout(() => {
+      tone(800,.25,.3,"square");
+    },500);
+  }
+
+  else if (type === "robot") {
+
+    tone(180,.2,.3,"square");
+
+    setTimeout(() => {
+      tone(350,.2,.3,"square");
+    },200);
+
+    setTimeout(() => {
+      tone(180,.3,.3,"square");
+    },400);
+  }
+
+  else if (type === "clap") {
+
+    const buffer = ctx.createBuffer(
+      1,
+      ctx.sampleRate * .15,
+      ctx.sampleRate
+    );
+
+    const data = buffer.getChannelData(0);
+
+    for (let i=0;i<data.length;i++) {
+      data[i] = (Math.random()*2-1) *
+        Math.exp(-i/data.length*15);
+    }
+
+    const source = ctx.createBufferSource();
+    const gain = ctx.createGain();
+
+    gain.gain.value = .8;
+
+    source.buffer = buffer;
+    source.connect(gain);
+    gain.connect(ctx.destination);
+
+    source.start();
+  }
+
+  else if (type === "laugh") {
+
+    tone(300,.12,.3,"sine");
+
+    setTimeout(() => tone(420,.12,.3,"sine"),150);
+    setTimeout(() => tone(300,.12,.3,"sine"),300);
+    setTimeout(() => tone(420,.15,.3,"sine"),450);
+  }
+}
+
+
+/* ---------- TURN ---------- */
+
+function startTurn() {
+
+  show("challenge");
+
+  currentSound =
+    sounds[Math.floor(Math.random()*sounds.length)];
+
+  document.getElementById("roundText").textContent =
+    "Round " + currentRound +
+    " · " +
+    players[currentPlayer] +
+    "'s turn";
+
+  document.getElementById("soundEmoji").textContent =
+    currentSound.emoji;
+
+  document.getElementById("soundName").textContent =
+    currentSound.name;
+
+  document.getElementById("countdown").textContent = "";
+
+  document.getElementById("recordBtn")
+    .classList.add("hidden");
+
+  document.getElementById("playSoundBtn")
+    .classList.remove("hidden");
+
+  document.getElementById("status").textContent =
+    "Listen carefully!";
+}
+
+
+/* ---------- PLAY BUTTON ---------- */
+
+document.getElementById("playSoundBtn")
+.addEventListener("click", () => {
+
+  playSound(currentSound.type);
+
+  document.getElementById("playSoundBtn")
+    .classList.add("hidden");
+
+  countdown();
+});
+
+
+/* ---------- COUNTDOWN ---------- */
+
+function countdown() {
+
+  let count = 3;
+
+  const box = document.getElementById("countdown");
+
+  box.textContent = count;
+
+  const timer = setInterval(() => {
+
+    count--;
+
+    if (count > 0) {
+      box.textContent = count;
+    }
+
+    else {
+
+      clearInterval(timer);
+
+      box.textContent = "GO!";
+
+      document.getElementById("recordBtn")
+        .classList.remove("hidden");
+
+      document.getElementById("status").textContent =
+        "Hold the button and mimic the sound!";
+    }
+
+  },1000);
+}
+
+
+/* ---------- RECORDING ---------- */
+
+document.getElementById("recordBtn")
+.addEventListener("pointerdown", startRecording);
+
+document.getElementById("recordBtn")
+.addEventListener("pointerup", stopRecording);
+
+document.getElementById("recordBtn")
+.addEventListener("pointercancel", stopRecording);
+
+
+async function startRecording(e) {
+
+  e.preventDefault();
+
+  try {
+
+    const stream =
+      await navigator.mediaDevices.getUserMedia({
+        audio:true
+      });
+
+    audioChunks = [];
+
+    recorder =
+      new MediaRecorder(stream);
+
+    recorder.ondataavailable = event => {
+      audioChunks.push(event.data);
+    };
+
+    recorder.onstop = () => {
+
+      stream.getTracks().forEach(track => track.stop());
+
+      calculateScore();
+    };
+
+    recorder.start();
+
+    recordingStart = Date.now();
+
+    document.getElementById("recordBtn")
+      .textContent = "🔴 Recording...";
+
+    document.getElementById("status").textContent =
+      "Make your best impression!";
+
+  }
+
+  catch(error) {
+
+    alert(
+      "Microphone access is needed to play this game. " +
+      "Please allow microphone access and try again."
+    );
+  }
+}
+
+
+function stopRecording() {
+
+  if (!recorder) return;
+
+  if (recorder.state === "recording") {
+
+    recorder.stop();
+
+    document.getElementById("recordBtn")
+      .classList.add("hidden");
+
+    document.getElementById("status").textContent =
+      "Scoring your impression...";
+  }
+}
+
+
+/* ---------- SCORING ---------- */
+
+/*
+This first version uses recording length and loudness
+to create a simple prototype score.
+
+Later we can replace this with proper audio analysis
+so the game actually compares the player's sound
+with the original sound.
+*/
+
+function calculateScore() {
+
+  const duration =
+    (Date.now() - recordingStart) / 1000;
+
+  let score = 40;
+
+  if (duration >= .25 && duration <= 1.5) {
+    score += 35;
+  }
+
+  else if (duration >= .15 && duration <= 2) {
+    score += 20;
+  }
+
+  score += Math.floor(Math.random()*26);
+
+  score = Math.min(100, score);
+
+  scores[players[currentPlayer]] += score;
+
+  showScore(score);
+}
+
+
+/* ---------- SHOW SCORE ---------- */
+
+function showScore(score) {
+
+  show("scoreScreen");
+
+  document.getElementById("playerResult")
+    .textContent =
+    players[currentPlayer] + "'s score";
+
+  document.getElementById("scoreNumber")
+    .textContent = score;
+}
+
+
+/* ---------- NEXT PLAYER ---------- */
+
+document.getElementById("nextBtn")
+.addEventListener("click", () => {
+
+  currentPlayer++;
+
+  if (currentPlayer >= players.length) {
+
+    showLeaderboard();
+
+  } else {
+
+    startTurn();
+  }
+});
+
+
+/* ---------- LEADERBOARD ---------- */
+
+function getSortedPlayers() {
+
+  return [...players].sort(
+    (a,b) => scores[b] - scores[a]
+  );
+}
+
+
+function showLeaderboard() {
+
+  show("leaderboardScreen");
+
+  const box =
+    document.getElementById("leaderboard");
+
+  box.innerHTML = "";
+
+  getSortedPlayers().forEach((player,index) => {
+
+    const row = document.createElement("div");
+
+    row.innerHTML =
+      "<span>" +
+      (index + 1) +
+      ". " +
+      player +
+      "</span><strong>" +
+      scores[player] +
+      "</strong>";
+
+    box.appendChild(row);
+  });
+}
+
+
+/* ---------- NEXT ROUND ---------- */
+
+document.getElementById("nextRoundBtn")
+.addEventListener("click", () => {
+
+  currentRound++;
+
+  if (currentRound > 3) {
+
+    showFinal();
+
+  } else {
+
+    currentPlayer = 0;
+
+    startTurn();
+  }
+});
+
+
+/* ---------- FINISH ---------- */
+
+document.getElementById("finishBtn")
+.addEventListener("click", showFinal);
+
+
+function showFinal() {
+
+  show("finalScreen");
+
+  const box =
+    document.getElementById("finalLeaderboard");
+
+  box.innerHTML = "";
+
+  getSortedPlayers().forEach((player,index) => {
+
+    let medal = "";
+
+    if (index === 0) medal = "🥇 ";
+    if (index === 1) medal = "🥈 ";
+    if (index === 2) medal = "🥉 ";
+
+    const row = document.createElement("div");
+
+    row.innerHTML =
+      "<span>" +
+      medal +
+      player +
+      "</span><strong>" +
+      scores[player] +
+      "</strong>";
+
+    box.appendChild(row);
+  });
+}
+
+
+/* ---------- PLAY AGAIN ---------- */
+
+document.getElementById("againBtn")
+.addEventListener("click", () => {
+
+  currentRound = 1;
+  currentPlayer = 0;
+
+  scores = {};
+
+  players.forEach(p => scores[p] = 0);
+
+  startTurn();
+});
+
+</script>
+
+</body>
+</html>
